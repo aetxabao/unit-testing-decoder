@@ -36,7 +36,7 @@ namespace CryptoLib
                 return stringWriter.ToString();
             }
         }
-        private static RSAParameters RsaParsFromXml(string data)
+        private static RSAParameters RsaParsFromXml(string data) 
         {
             return new RSAParameters();
         }
