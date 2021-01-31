@@ -38,7 +38,13 @@ namespace CryptoLib
         }
         private static RSAParameters RsaParsFromXml(string data)
         {
-            return new RSAParameters();
+            XmlSerializer xml = new XmlSerializer(typeof(RSAParameters));
+            object result;
+            using (TextReader reader = new StringReader(data))
+            {
+                result = xml.Deserialize(reader);
+            }
+            return (RSAParameters)result;
         }
 
         public static string RsaEncrypt(string text, string pubParsXml)
