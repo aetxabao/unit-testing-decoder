@@ -61,7 +61,10 @@ namespace CryptoLib
 
         public static string RsaDecrypt(string code, RSACryptoServiceProvider rsa)
         {
-            return null;
+            byte[] encrypted = System.Convert.FromBase64String(code);
+            byte[] decrypted = rsa.Decrypt(encrypted, false);
+            string text = Encoding.UTF8.GetString(decrypted);
+            return text;
         }
         public static string SignedData(string text, RSACryptoServiceProvider rsa)
         {
