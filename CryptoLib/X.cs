@@ -9,7 +9,6 @@ namespace CryptoLib
 {
     public class X
     {
-
         public static string RsaGetPubParsXml(RSACryptoServiceProvider rsa)
         {
             bool isPriv = false;
@@ -18,6 +17,8 @@ namespace CryptoLib
             pars.Modulus = rsa.ExportParameters(isPriv).Modulus;
             return RsaParsToXml(pars);
         }
+
+
         private static string RsaParsToXml(RSAParameters pars)
         {
             var serializer = new XmlSerializer(typeof(RSAParameters));
@@ -36,24 +37,32 @@ namespace CryptoLib
                 return stringWriter.ToString();
             }
         }
+
+
         private static RSAParameters RsaParsFromXml(string data)
         {
             return new RSAParameters();
         }
+
 
         public static string RsaEncrypt(string text, string pubParsXml)
         {
             return null;
         }
 
+
         public static string RsaDecrypt(string code, RSACryptoServiceProvider rsa)
         {
             return null;
         }
+
+
         public static string SignedData(string text, RSACryptoServiceProvider rsa)
         {
             return null;
         }
+
+
         public static bool VerifyData(string text, string signedText, string pubParsXml)
         {
             return false;
@@ -65,15 +74,19 @@ namespace CryptoLib
             iv = "";
             return null;
         }
+
+
         public static string AesDecrypt(string enc, string pwd, string sal)
         {
             return null;
         }
 
+
         public static string ShaHash(Object input)
         {
             return null;
         }
+
 
         public static string RandomString(int length)
         {
@@ -92,7 +105,6 @@ namespace CryptoLib
             }
             return res.ToString();
         }
-
     }
 
     public class Utf8StringWriter : StringWriter
