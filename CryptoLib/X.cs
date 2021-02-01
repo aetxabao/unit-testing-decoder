@@ -147,7 +147,16 @@ namespace CryptoLib
 
         public static string ShaHash(Object input)
         {
-            return null;
+            byte[] data = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes((String)input));
+
+            StringBuilder sBuilder = new StringBuilder();
+
+            foreach (byte b in data)
+            {
+                sBuilder.Append(b.ToString("x2"));
+            }
+
+            return sBuilder.ToString();
         }
 
 
