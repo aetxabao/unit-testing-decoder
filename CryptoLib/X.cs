@@ -86,8 +86,28 @@ namespace CryptoLib
 
         public static string AesEncrypt(string msg, string pwd, out string iv)
         {
-            iv = "";
-            return null;
+            byte[] encrypted;
+
+            using (Aes aesAlg = Aes.Create())
+            {
+                byte[] key = Encoding.UTF8.GetBytes(pwd);
+                Array.Resize(ref key, 32);
+                aesAlg.Key = key;
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            swEncrypt.Write(msg);
+                        }
+                        encrypted = msEncrypt.ToArray();
+                    }
+                }
+            iv = Convert.ToBase64String(aesAlg.IV, 0, aesAlg.IV.Length);
+            return Convert.ToBase64String(encrypted, 0, encrypted.Length);
         }
         public static string AesDecrypt(string enc, string pwd, string sal)
         {
