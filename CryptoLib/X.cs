@@ -41,19 +41,28 @@ namespace CryptoLib
 
         private static RSAParameters RsaParsFromXml(string data)
         {
-            return new RSAParameters();
+            XmlSerializer xml = new XmlSerializer(typeof(RSAParameters));
+
+            using (TextReader reader = new StringReader(data))
+            {
+                return (RSAParameters)xml.Deserialize(reader);
+            }
         }
 
 
         public static string RsaEncrypt(string text, string pubParsXml)
         {
-            return null;
+            using (RSACryptoServiceProvider tester = new RSACryptoServiceProvider())
+            {
+                tester.ImportParameters(RsaParsFromXml(pubParsXml));
+                return Convert.ToBase64String(tester.Encrypt(Encoding.Default.GetBytes(text), false));
+            }
         }
 
 
         public static string RsaDecrypt(string code, RSACryptoServiceProvider rsa)
         {
-            return null;
+            return Encoding.UTF8.GetString(rsa.Decrypt(System.Convert.FromBase64String(code), false));
         }
 
 
