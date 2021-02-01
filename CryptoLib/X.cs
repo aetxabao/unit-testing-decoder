@@ -50,7 +50,14 @@ namespace CryptoLib
 
         public static string RsaEncrypt(string text, string pubParsXml)
         {
-            return null;
+            byte[] data = Encoding.Default.GetBytes(text);
+            using (RSACryptoServiceProvider tester = new RSACryptoServiceProvider())
+            {
+                tester.ImportParameters(publicParameters);
+                byte[] encrypted = tester.Encrypt(data, false);
+                string base64 = Convert.ToBase64String(encrypted, 0, encrypted.Length);
+                return base64;
+            }
         }
 
         public static string RsaDecrypt(string code, RSACryptoServiceProvider rsa)
