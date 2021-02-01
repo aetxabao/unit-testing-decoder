@@ -111,7 +111,33 @@ namespace CryptoLib
         }
         public static string AesDecrypt(string enc, string pwd, string sal)
         {
-            return null;
+            byte[] encrypted = System.Convert.FromBase64String(enc);
+
+                byte[] key = Encoding.UTF8.GetBytes(pwd);
+                Array.Resize(ref key, 32);
+                byte[] iv = System.Convert.FromBase64String(sal);
+                Array.Resize(ref iv, 16);
+
+                string plaintext = null;
+
+                using (Aes aesAlg = Aes.Create())
+                {
+                    aesAlg.Key = key;
+                    aesAlg.IV = iv;
+
+                    ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+                    using (MemoryStream msDecrypt = new MemoryStream(encrypted))
+                    {
+                        using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                        {
+                            using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                            {
+                                plaintext = srDecrypt.ReadToEnd();
+                            }
+                        }
+                        return plaintext;
+                    }
+                }
         }
 
         public static string ShaHash(Object input)
