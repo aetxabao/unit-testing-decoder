@@ -34,6 +34,7 @@ namespace CryptoLib
                 {
                     serializer.Serialize(xmlWriter, pars);
                 }
+
                 return stringWriter.ToString();
             }
         }
@@ -55,26 +56,47 @@ namespace CryptoLib
             using (RSACryptoServiceProvider tester = new RSACryptoServiceProvider())
             {
                 tester.ImportParameters(RsaParsFromXml(pubParsXml));
-                return Convert.ToBase64String(tester.Encrypt(Encoding.Default.GetBytes(text), false));
+
+                return
+                    Convert.ToBase64String(
+                        tester.Encrypt(
+                            Encoding.Default.GetBytes(text),
+                            false));
             }
         }
 
 
         public static string RsaDecrypt(string code, RSACryptoServiceProvider rsa)
         {
-            return Encoding.UTF8.GetString(rsa.Decrypt(System.Convert.FromBase64String(code), false));
+            return
+                Encoding.UTF8.GetString(
+                    rsa.Decrypt(
+                        System.Convert.FromBase64String(code),
+                        false));
         }
 
 
         public static string SignedData(string text, RSACryptoServiceProvider rsa)
         {
-            return null;
+            return 
+                Convert.ToBase64String(
+                    rsa.SignData(
+                        Encoding.Default.GetBytes(text),
+                        new SHA1CryptoServiceProvider()));
         }
 
 
         public static bool VerifyData(string text, string signedText, string pubParsXml)
         {
-            return false;
+            RSACryptoServiceProvider tester = new RSACryptoServiceProvider();
+
+            tester.ImportParameters(RsaParsFromXml(pubParsXml));
+
+            return
+                tester.VerifyData(
+                    Encoding.Default.GetBytes(text),
+                    new SHA1CryptoServiceProvider(),
+                    Convert.FromBase64String(signedText));
         }
 
 
