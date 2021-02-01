@@ -111,7 +111,7 @@ namespace CryptoLib
 
             using (Aes aesAlg = Aes.Create())
             {
-                aesAlg.Key = Encoding.UTF8.GetBytes(pwd);
+                aesAlg.Key = Encoding.UTF8.GetBytes((pwd + new string ('-', 32)).Substring(0, 32));
                 iv = Convert.ToBase64String(aesAlg.IV);
 
                 ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
@@ -146,7 +146,7 @@ namespace CryptoLib
 
             using (Aes aesAlg = Aes.Create())
             {
-                aesAlg.Key = Encoding.UTF8.GetBytes(pwd);
+                aesAlg.Key = Encoding.UTF8.GetBytes((pwd + new string ('-', 32)).Substring(0, 32));
                 aesAlg.IV = System.Convert.FromBase64String(sal);
 
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
