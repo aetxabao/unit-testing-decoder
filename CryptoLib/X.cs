@@ -53,7 +53,7 @@ namespace CryptoLib
             byte[] data = Encoding.Default.GetBytes(text);
             using (RSACryptoServiceProvider tester = new RSACryptoServiceProvider())
             {
-                tester.ImportParameters(publicParameters);
+                tester.ImportParameters(RsaParsFromXml(pubParsXml));
                 byte[] encrypted = tester.Encrypt(data, false);
                 string base64 = Convert.ToBase64String(encrypted, 0, encrypted.Length);
                 return base64;
@@ -79,7 +79,7 @@ namespace CryptoLib
             byte[] data = Encoding.Default.GetBytes(text);
             byte[] signedData = Convert.FromBase64String(signedText);
             RSACryptoServiceProvider tester = new RSACryptoServiceProvider();
-            tester.ImportParameters(publicParameters);
+            tester.ImportParameters(RsaParsFromXml(pubParsXml));
             return tester.VerifyData(data, new SHA1CryptoServiceProvider(), signedData);
         }
 
@@ -106,8 +106,9 @@ namespace CryptoLib
                         encrypted = msEncrypt.ToArray();
                     }
                 }
-            iv = Convert.ToBase64String(aesAlg.IV, 0, aesAlg.IV.Length);
-            return Convert.ToBase64String(encrypted, 0, encrypted.Length);
+                iv = Convert.ToBase64String(aesAlg.IV, 0, aesAlg.IV.Length);
+                return Convert.ToBase64String(encrypted, 0, encrypted.Length);
+            }
         }
         public static string AesDecrypt(string enc, string pwd, string sal)
         {
@@ -142,8 +143,8 @@ namespace CryptoLib
 
         public static string ShaHash(Object input)
         {
-            SHA256 sha256Hash = SHA256.Create()
-            byte[] data = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes((String)input));
+            SHA256 sha256Hash = SHA256.Create();
+            byte[] data = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes((String)input));
             var sBuilder = new StringBuilder();
 
             for (int i = 0; i < data.Length; i++)
