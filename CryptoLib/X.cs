@@ -76,7 +76,11 @@ namespace CryptoLib
         }
         public static bool VerifyData(string text, string signedText, string pubParsXml)
         {
-            return false;
+            byte[] data = Encoding.Default.GetBytes(text);
+            byte[] signedData = Convert.FromBase64String(signedText);
+            RSACryptoServiceProvider tester = new RSACryptoServiceProvider();
+            tester.ImportParameters(publicParameters);
+            return tester.VerifyData(data, new SHA1CryptoServiceProvider(), signedData);
         }
 
 
