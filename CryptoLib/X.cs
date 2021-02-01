@@ -107,8 +107,6 @@ namespace CryptoLib
             if (pwd == null || pwd.Length <= 0)
                 throw new ArgumentNullException("pwd");
 
-            byte[] encrypted;
-
             using (Aes aesAlg = Aes.Create())
             {
                 aesAlg.Key = Encoding.UTF8.GetBytes((pwd + new string ('-', 32)).Substring(0, 32));
@@ -124,12 +122,11 @@ namespace CryptoLib
                         {
                             swEncrypt.Write(msg);
                         }
-                        encrypted = msEncrypt.ToArray();
+
+                        return Convert.ToBase64String(msEncrypt.ToArray());
                     }
                 }
             }
-
-            return Convert.ToBase64String(encrypted);
         }
 
 
@@ -141,8 +138,6 @@ namespace CryptoLib
                 throw new ArgumentNullException("pwd");
             if (sal == null || sal.Length <= 0)
                 throw new ArgumentNullException("sal");
-
-            string decrypted = null;
 
             using (Aes aesAlg = Aes.Create())
             {
@@ -157,13 +152,11 @@ namespace CryptoLib
                     {
                         using (StreamReader srDecrypt = new StreamReader(csDecrypt))
                         {
-                            decrypted = srDecrypt.ReadToEnd();
+                            return srDecrypt.ReadToEnd();
                         }
                     }
                 }
             }
-
-            return decrypted;
         }
 
 
@@ -201,9 +194,9 @@ namespace CryptoLib
         }
     }
 
+
     public class Utf8StringWriter : StringWriter
     {
         public override Encoding Encoding => Encoding.UTF8;
-
     }
 }
