@@ -43,7 +43,10 @@ namespace CryptoLib
 
         public static string RsaEncrypt(string text, string pubParsXml)
         {
-            return null;
+            byte[] data = Encoding.Default.GetBytes(text);
+            using (RSACryptoServiceProvider tester = new RSACryptoServiceProvider())
+            { }
+            return "hola";
         }
 
         public static string RsaDecrypt(string code, RSACryptoServiceProvider rsa)
@@ -63,16 +66,73 @@ namespace CryptoLib
         public static string AesEncrypt(string msg, string pwd, out string iv)
         {
             iv = "";
-            return null;
+            byte[] encrypted;
+            using (Aes aesAlg = Aes.Create())
+            {
+                byte[] key = Encoding.UTF8.GetBytes(pwd);
+                Array.Resize(ref key, 32);
+                aesAlg.Key = key;
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            swEncrypt.Write(msg);
+                        }
+                        encrypted = msEncrypt.ToArray();
+                    }
+                }
+                iv = Convert.ToBase64String(aesAlg.IV, 0, aesAlg.IV.Length);
+            }
+            return Convert.ToBase64String(encrypted, 0, encrypted.Length);
         }
         public static string AesDecrypt(string enc, string pwd, string sal)
         {
-            return null;
+            byte[] encrypted = System.Convert.FromBase64String(enc);
+
+            byte[] key = Encoding.UTF8.GetBytes(pwd);
+            Array.Resize(ref key, 32);
+            byte[] iv = System.Convert.FromBase64String(sal);
+            Array.Resize(ref iv, 16);
+
+            string plaintext = null;
+
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = key;
+                aesAlg.IV = iv;
+
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+                using (MemoryStream msDecrypt = new MemoryStream(encrypted))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+                            plaintext = srDecrypt.ReadToEnd();
+                        }
+                    }
+                }
+            }
+            return plaintext;
         }
 
         public static string ShaHash(Object input)
         {
-            return null;
+            var sBuilder = new StringBuilder();
+            using (SHA256 hashAlgorithm = SHA256.Create())
+            {
+                byte[] data = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes((String)input));
+
+                for (int i = 0; i < data.Length; i++)
+                {
+                    sBuilder.Append(data[i].ToString("x2"));
+                }
+            }
+            return sBuilder.ToString();
         }
 
         public static string RandomString(int length)
