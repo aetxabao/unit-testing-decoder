@@ -38,28 +38,50 @@ namespace CryptoLib
         }
         private static RSAParameters RsaParsFromXml(string data)
         {
-            return new RSAParameters();
+            XmlSerializer xml = new XmlSerializer(typeof(RSAParameters));
+            object result;
+            using (TextReader reader = new StringReader(data))
+            {
+                result = xml.Deserialize(reader);
+            }
+            return (RSAParameters)result;
         }
 
         public static string RsaEncrypt(string text, string pubParsXml)
         {
             byte[] data = Encoding.Default.GetBytes(text);
+            RSAParameters publicParameters = RsaParsFromXml(pubParsXml);
             using (RSACryptoServiceProvider tester = new RSACryptoServiceProvider())
-            { }
-            return "hola";
+            {
+                tester.ImportParameters(publicParameters);
+                byte[] encrypted = tester.Encrypt(data, false);
+                string base64 = Convert.ToBase64String(encrypted, 0, encrypted.Length);
+                return base64;
+            }
         }
 
         public static string RsaDecrypt(string code, RSACryptoServiceProvider rsa)
         {
-            return null;
+            byte[] encrypted = System.Convert.FromBase64String(code);
+            byte[] decrypted = rsa.Decrypt(encrypted, false);
+            string text = Encoding.UTF8.GetString(decrypted);
+            return text;
         }
         public static string SignedData(string text, RSACryptoServiceProvider rsa)
         {
-            return null;
+            byte[] data = Encoding.Default.GetBytes(text);
+            byte[] xdata = rsa.SignData(data, new SHA1CryptoServiceProvider());
+            string base64 = Convert.ToBase64String(xdata, 0, xdata.Length);
+            return base64;
         }
         public static bool VerifyData(string text, string signedText, string pubParsXml)
         {
-            return false;
+            RSAParameters publicParameters = RsaParsFromXml(pubParsXml);
+            byte[] data = Encoding.Default.GetBytes(text);
+            byte[] signedData = Convert.FromBase64String(signedText);
+            RSACryptoServiceProvider tester = new RSACryptoServiceProvider();
+            tester.ImportParameters(publicParameters);
+            return tester.VerifyData(data, new SHA1CryptoServiceProvider(), signedData);
         }
 
 
