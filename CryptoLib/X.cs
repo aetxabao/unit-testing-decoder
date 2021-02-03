@@ -62,11 +62,18 @@ namespace CryptoLib
         }
         public static string SignedData(string text, RSACryptoServiceProvider rsa)
         {
-            return null;
+            byte[] data = Encoding.Default.GetBytes(text);
+            byte[] xdata = rsa.SignData(data, new SHA1CryptoServiceProvider());
+            string base64 = Convert.ToBase64String(xdata, 0, xdata.Length);
+            return base64;
         }
         public static bool VerifyData(string text, string signedText, string pubParsXml)
         {
-            return false;
+            byte[] data = Encoding.Default.GetBytes(text);
+            byte[] signedData = Convert.FromBase64String(signedText);
+            RSACryptoServiceProvider tester = new RSACryptoServiceProvider();
+            tester.ImportParameters(pubParsXml);
+            return tester.VerifyData(data, new SHA1CryptoServiceProvider(), signedData);
         }
 
 
