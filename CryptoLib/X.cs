@@ -72,17 +72,90 @@ namespace CryptoLib
 
         public static string AesEncrypt(string msg, string pwd, out string iv)
         {
-            iv = "";
-            return null;
+            // Check arguments.
+            if (msg == null || msg.Length <= 0)
+                throw new ArgumentNullException("msg");
+            if (pwd == null || pwd.Length <= 0)
+                throw new ArgumentNullException("pwd");
+            if (iv == null || iv.Length <= 0)
+                throw new ArgumentNullException("iv");
+            string encrypted = null;
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = pwd;
+                aesAlg.IV = iv;
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.pwd, aesAlg.iv);
+
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            //Write all data to the stream.
+                            swEncrypt.Write(msg);
+                        }
+                        encrypted = msEncrypt.toString();
+                    }
+                }
+            }
+            return encrypted;
         }
+
         public static string AesDecrypt(string enc, string pwd, string sal)
         {
-            return null;
+            // Check arguments.
+            if (enc == null || enc.Length <= 0)
+                throw new ArgumentNullException("enc");
+            if (pwd == null || pwd.Length <= 0)
+                throw new ArgumentNullException("pwd");
+            if (sal == null || sal.Length <= 0)
+                throw new ArgumentNullException("sal");
+
+            // Declare the string used to hold
+            // the decrypted text.
+            string plaintext = null;
+
+            // Create an Aes object
+            // with the specified key and IV.
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = pwd;
+                aesAlg.IV = sal;
+
+                // Create a decryptor to perform the stream transform.
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.pwd, aesAlg.sal);
+
+                // Create the streams used for decryption.
+                using (MemoryStream msDecrypt = new MemoryStream(enc))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+
+                            // Read the decrypted bytes from the decrypting stream
+                            // and place them in a string.
+                            plaintext = srDecrypt.ReadToEnd();
+                        }
+                    }
+                }
+
+            }
+
+            return plaintext;
         }
 
         public static string ShaHash(Object input)
         {
-            return null;
+            string source = input;
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                string hash = GetHash(sha256Hash, source);
+
+                Console.WriteLine($"The SHA256 hash of {source} is: {hash}.");
+            }
         }
 
         public static string RandomString(int length)
