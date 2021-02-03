@@ -43,12 +43,22 @@ namespace CryptoLib
 
         public static string RsaEncrypt(string text, string pubParsXml)
         {
-            return null;
+            byte[] data = Encoding.Default.GetBytes(text);
+            using (RSACryptoServiceProvider tester = new RSACryptoServiceProvider())
+            {
+                tester.ImportParameters(pubParsXml);
+                byte[] encrypted = tester.Encrypt(data, false);
+                string resultado = Convert.ToBase64String(encrypted, 0, encrypted.Length);
+                return resultado;
+            }
         }
 
         public static string RsaDecrypt(string code, RSACryptoServiceProvider rsa)
         {
-            return null;
+            byte[] encrypted = System.Convert.FromBase64String(code);
+            byte[] decrypted = rsa.Decrypt(encrypted, false);
+            string text = Encoding.UTF8.GetString(decrypted);
+            return text;
         }
         public static string SignedData(string text, RSACryptoServiceProvider rsa)
         {
