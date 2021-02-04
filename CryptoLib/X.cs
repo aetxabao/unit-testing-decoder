@@ -36,6 +36,7 @@ namespace CryptoLib
                 return stringWriter.ToString();
             }
         }
+
         private static RSAParameters RsaParsFromXml(string data)
         {
             return new RSAParameters();
@@ -60,6 +61,7 @@ namespace CryptoLib
             string text = Encoding.UTF8.GetString(decrypted);
             return text;
         }
+
         public static string SignedData(string text, RSACryptoServiceProvider rsa)
         {
             byte[] data = Encoding.Default.GetBytes(text);
@@ -67,6 +69,7 @@ namespace CryptoLib
             string base64 = Convert.ToBase64String(xdata, 0, xdata.Length);
             return base64;
         }
+
         public static bool VerifyData(string text, string signedText, string pubParsXml)
         {
             byte[] data = Encoding.Default.GetBytes(text);
@@ -75,7 +78,6 @@ namespace CryptoLib
             tester.ImportParameters(pubParsXml);
             return tester.VerifyData(data, new SHA1CryptoServiceProvider(), signedData);
         }
-
 
         public static string AesEncrypt(string msg, string pwd, out string iv)
         {
@@ -109,6 +111,7 @@ namespace CryptoLib
             }
             return encrypted;
         }
+
 
         public static string AesDecrypt(string enc, string pwd, string sal)
         {
@@ -150,7 +153,6 @@ namespace CryptoLib
                 }
 
             }
-
             return plaintext;
         }
 
