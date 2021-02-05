@@ -4,12 +4,10 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-
 namespace CryptoLib
 {
     public class X
     {
-
         public static string RsaGetPubParsXml(RSACryptoServiceProvider rsa)
         {
             bool isPriv = false;
@@ -36,6 +34,7 @@ namespace CryptoLib
                 return stringWriter.ToString();
             }
         }
+
         private static RSAParameters RsaParsFromXml(string data)
         {
             return new RSAParameters();
@@ -43,38 +42,107 @@ namespace CryptoLib
 
         public static string RsaEncrypt(string text, string pubParsXml)
         {
-            return null;
+            byte[] data = Encoding.Default.GetBytes(text);
+            using (RSACryptoServiceProvider tester = new RSACryptoServiceProvider())
+            {
+                tester.ImportParameters(pubParsXml);
+                byte[] encrypted = tester.Encrypt(data, false);
+                string resultado = Convert.ToBase64String(encrypted, 0, encrypted.Length);
+                return resultado;
+            }
         }
 
         public static string RsaDecrypt(string code, RSACryptoServiceProvider rsa)
         {
-            return null;
-        }
-        public static string SignedData(string text, RSACryptoServiceProvider rsa)
-        {
-            return null;
-        }
-        public static bool VerifyData(string text, string signedText, string pubParsXml)
-        {
-            return false;
+            byte[] encrypted = System.Convert.FromBase64String(code);
+            byte[] decrypted = rsa.Decrypt(encrypted, false);
+            string text = Encoding.UTF8.GetString(decrypted);
+            return text;
         }
 
+        public static string SignedData(string text, RSACryptoServiceProvider rsa)
+        {
+            byte[] data = Encoding.Default.GetBytes(text);
+            byte[] xdata = rsa.SignData(data, new SHA1CryptoServiceProvider());
+            string base64 = Convert.ToBase64String(xdata, 0, xdata.Length);
+            return base64;
+        }
+
+        public static bool VerifyData(string text, string signedText, string pubParsXml)
+        {
+            byte[] data = Encoding.Default.GetBytes(text);
+            byte[] signedData = Convert.FromBase64String(signedText);
+            RSACryptoServiceProvider tester = new RSACryptoServiceProvider();
+            tester.ImportParameters(pubParsXml);
+            return tester.VerifyData(data, new SHA1CryptoServiceProvider(), signedData);
+        }
 
         public static string AesEncrypt(string msg, string pwd, out string iv)
         {
-            iv = "";
-            return null;
+            if (msg == null || msg.Length <= 0)
+                throw new ArgumentNullException("msg");
+            if (pwd == null || pwd.Length <= 0)
+                throw new ArgumentNullException("pwd");
+            if (iv == null || iv.Length <= 0)
+                throw new ArgumentNullException("iv");
+            string encrypted = null;
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = pwd;
+                aesAlg.IV = iv;
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.pwd, aesAlg.iv);
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            swEncrypt.Write(msg);
+                        }
+                        encrypted = msEncrypt.toString();
+                    }
+                }
+            }
+            return encrypted;
         }
+
         public static string AesDecrypt(string enc, string pwd, string sal)
         {
-            return null;
+            if (enc == null || enc.Length <= 0)
+                throw new ArgumentNullException("enc");
+            if (pwd == null || pwd.Length <= 0)
+                throw new ArgumentNullException("pwd");
+            if (sal == null || sal.Length <= 0)
+                throw new ArgumentNullException("sal");
+            string plaintext = null;
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = pwd;
+                aesAlg.IV = sal;
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.pwd, aesAlg.sal);
+                using (MemoryStream msDecrypt = new MemoryStream(enc))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+                            plaintext = srDecrypt.ReadToEnd();
+                        }
+                    }
+                }
+            }
+            return plaintext;
         }
 
         public static string ShaHash(Object input)
         {
-            return null;
+            string source = input;
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                string hash = GetHash(sha256Hash, source);
+                Console.WriteLine($"The SHA256 hash of {source} is: {hash}.");
+            }
         }
-
         public static string RandomString(int length)
         {
             const string valid = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -82,7 +150,6 @@ namespace CryptoLib
             using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
             {
                 byte[] uintBuffer = new byte[sizeof(uint)];
-
                 while (length-- > 0)
                 {
                     rng.GetBytes(uintBuffer);
@@ -92,12 +159,9 @@ namespace CryptoLib
             }
             return res.ToString();
         }
-
     }
-
     public class Utf8StringWriter : StringWriter
     {
         public override Encoding Encoding => Encoding.UTF8;
-
     }
 }
