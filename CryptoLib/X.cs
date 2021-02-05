@@ -38,40 +38,123 @@ namespace CryptoLib
         }
         private static RSAParameters RsaParsFromXml(string data)
         {
-            return new RSAParameters();
+            //TODO: RsaParsFromXml
+            XmlSerializer xml = new XmlSerializer(typeof(RSAParameters));
+            object result;
+            using (TextReader reader = new StringReader(data))
+            {
+                result = xml.Deserialize(reader);
+            }
+            return (RSAParameters)result;
         }
 
         public static string RsaEncrypt(string text, string pubParsXml)
         {
-            return null;
+            //TODO: RsaEncrypt
+            byte[] data = Encoding.Default.GetBytes(text);
+            RSAParameters publicParameters = RsaParsFromXml(pubParsXml);
+            using (RSACryptoServiceProvider tester = new RSACryptoServiceProvider())
+            {
+                tester.ImportParameters(publicParameters);
+                byte[] encrypted = tester.Encrypt(data, false);
+                string base64 = Convert.ToBase64String(encrypted, 0, encrypted.Length);
+                return base64;
+            }
         }
 
         public static string RsaDecrypt(string code, RSACryptoServiceProvider rsa)
         {
-            return null;
+            //TODO: RsaDecrypt
+            byte[] encrypted = System.Convert.FromBase64String(code);
+            byte[] decrypted = rsa.Decrypt(encrypted, false);
+            string text = Encoding.UTF8.GetString(decrypted);
+            return text;
         }
         public static string SignedData(string text, RSACryptoServiceProvider rsa)
         {
-            return null;
+            //TODO: SignedData
+            byte[] data = Encoding.Default.GetBytes(text);
+            byte[] xdata = rsa.SignData(data, new SHA1CryptoServiceProvider());
+            string base64 = Convert.ToBase64String(xdata, 0, xdata.Length);
+            return base64;
         }
         public static bool VerifyData(string text, string signedText, string pubParsXml)
         {
-            return false;
+            //TODO: VerifyData
+            byte[] data = Encoding.Default.GetBytes(text);
+            RSAParameters publicParameters = RsaParsFromXml(pubParsXml);
+            byte[] signedData = Convert.FromBase64String(signedText);
+            RSACryptoServiceProvider tester = new RSACryptoServiceProvider();
+            tester.ImportParameters(publicParameters);
+            return tester.VerifyData(data, new SHA1CryptoServiceProvider(), signedData);
         }
 
 
         public static string AesEncrypt(string msg, string pwd, out string iv)
         {
+            //DONE: AesEncrypt
             iv = "";
-            return null;
+            string encryptedMsg;
+            byte[] encrypted;
+
+            using (Aes aesAlg = Aes.Create())
+            {
+                byte[] key = Encoding.UTF8.GetBytes(pwd);
+                Array.Resize(ref key, 32);
+                aesAlg.Key = key;
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            //Write all data to the stream.
+                            swEncrypt.Write(msg);
+                        }
+                        encrypted = msEncrypt.ToArray();
+                    }
+                }
+                encryptedMsg = Convert.ToBase64String(encrypted, 0, encrypted.Length);
+                iv = Convert.ToBase64String(aesAlg.IV, 0, aesAlg.IV.Length);
+            }
+
+            return encryptedMsg;
         }
         public static string AesDecrypt(string enc, string pwd, string sal)
         {
-            return null;
+            //DONE: AesDecrypt
+            string plaintext = "";
+            using (Aes aesAlg = Aes.Create())
+            {
+                byte[] key = Encoding.UTF8.GetBytes(pwd);
+                Array.Resize(ref key, 32);
+                aesAlg.Key = key;
+                aesAlg.IV = Convert.FromBase64String(sal);
+
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+                using (MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(enc)))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+
+                            // Read the decrypted bytes from the decrypting stream
+                            // and place them in a string.
+                            plaintext = srDecrypt.ReadToEnd();
+                        }
+                    }
+                }
+            }
+
+            return plaintext;
         }
 
         public static string ShaHash(Object input)
         {
+            //TODO: ShaHash
             return null;
         }
 
