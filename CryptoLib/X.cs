@@ -155,7 +155,25 @@ namespace CryptoLib
         public static string ShaHash(Object input)
         {
             //TODO: ShaHash
-            return null;
+            // Convert the input string to a byte array and compute the hash.
+            // Se puede convertir un objeto que haya sido serializado de la misma forma a partir 
+            // de los bytes que se van a enviar por el socket
+            SHA256 hashAlgorithm = SHA256.Create();
+            byte[] data = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes((String)input));
+
+            // Create a new Stringbuilder to collect the bytes
+            // and create a string.
+            var sBuilder = new StringBuilder();
+
+            // Loop through each byte of the hashed data 
+            // and format each one as a hexadecimal string.
+            for (int i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+
+            // Return the hexadecimal string.
+            return sBuilder.ToString();
         }
 
         public static string RandomString(int length)
