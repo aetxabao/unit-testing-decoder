@@ -38,7 +38,6 @@ namespace CryptoLib
         }
         private static RSAParameters RsaParsFromXml(string data)
         {
-            //TODO: RsaParsFromXml
             XmlSerializer xml = new XmlSerializer(typeof(RSAParameters));
             object result;
             using (TextReader reader = new StringReader(data))
@@ -50,7 +49,6 @@ namespace CryptoLib
 
         public static string RsaEncrypt(string text, string pubParsXml)
         {
-            //TODO: RsaEncrypt
             byte[] data = Encoding.Default.GetBytes(text);
             RSAParameters publicParameters = RsaParsFromXml(pubParsXml);
             using (RSACryptoServiceProvider tester = new RSACryptoServiceProvider())
@@ -64,7 +62,6 @@ namespace CryptoLib
 
         public static string RsaDecrypt(string code, RSACryptoServiceProvider rsa)
         {
-            //TODO: RsaDecrypt
             byte[] encrypted = System.Convert.FromBase64String(code);
             byte[] decrypted = rsa.Decrypt(encrypted, false);
             string text = Encoding.UTF8.GetString(decrypted);
@@ -72,7 +69,6 @@ namespace CryptoLib
         }
         public static string SignedData(string text, RSACryptoServiceProvider rsa)
         {
-            //TODO: SignedData
             byte[] data = Encoding.Default.GetBytes(text);
             byte[] xdata = rsa.SignData(data, new SHA1CryptoServiceProvider());
             string base64 = Convert.ToBase64String(xdata, 0, xdata.Length);
@@ -80,7 +76,6 @@ namespace CryptoLib
         }
         public static bool VerifyData(string text, string signedText, string pubParsXml)
         {
-            //TODO: VerifyData
             byte[] data = Encoding.Default.GetBytes(text);
             RSAParameters publicParameters = RsaParsFromXml(pubParsXml);
             byte[] signedData = Convert.FromBase64String(signedText);
@@ -92,7 +87,6 @@ namespace CryptoLib
 
         public static string AesEncrypt(string msg, string pwd, out string iv)
         {
-            //DONE: AesEncrypt
             iv = "";
             string encryptedMsg;
             byte[] encrypted;
@@ -110,7 +104,6 @@ namespace CryptoLib
                     {
                         using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
                         {
-                            //Write all data to the stream.
                             swEncrypt.Write(msg);
                         }
                         encrypted = msEncrypt.ToArray();
@@ -140,39 +133,23 @@ namespace CryptoLib
                     {
                         using (StreamReader srDecrypt = new StreamReader(csDecrypt))
                         {
-
-                            // Read the decrypted bytes from the decrypting stream
-                            // and place them in a string.
                             plaintext = srDecrypt.ReadToEnd();
                         }
                     }
                 }
             }
-
             return plaintext;
         }
 
         public static string ShaHash(Object input)
         {
-            //TODO: ShaHash
-            // Convert the input string to a byte array and compute the hash.
-            // Se puede convertir un objeto que haya sido serializado de la misma forma a partir 
-            // de los bytes que se van a enviar por el socket
             SHA256 hashAlgorithm = SHA256.Create();
             byte[] data = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes((String)input));
-
-            // Create a new Stringbuilder to collect the bytes
-            // and create a string.
             var sBuilder = new StringBuilder();
-
-            // Loop through each byte of the hashed data 
-            // and format each one as a hexadecimal string.
             for (int i = 0; i < data.Length; i++)
             {
                 sBuilder.Append(data[i].ToString("x2"));
             }
-
-            // Return the hexadecimal string.
             return sBuilder.ToString();
         }
 
