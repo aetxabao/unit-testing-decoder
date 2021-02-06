@@ -138,6 +138,7 @@ namespace CryptoLib
                         {
                             using (StreamReader srDecrypt = new StreamReader(csDecrypt))
                             {
+                                
                                 plaintext = srDecrypt.ReadToEnd();
                             }
                         }
